@@ -1,0 +1,40 @@
+---
+title: "va2298Project1"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+# Load libraries
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+library(dplyr)
+library(tidytext)
+#setwd("C:/Users/Vikas/OneDrive/Backup 1-8-17/Documents/Columbia/Senior/Applied Data Science/Project #1/Spr2017-Proj1-vikasarun/lib")
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+```{r}
+#Fetching data
+folder.path="../data/InauguralSpeeches/"
+speeches=list.files(path = folder.path, pattern = "*.txt")
+
+#Data cleaning
+SpeechCorpus = Corpus(DirSource(folder.path))
+SpeechCorpus = tm_map(SpeechCorpus, stripWhitespace)
+SpeechCorpus = tm_map(SpeechCorpus, content_transformer(tolower))
+SpeechCorpus = tm_map(SpeechCorpus, removeWords, stopwords("english"))
+SpeechCorpus = tm_map(SpeechCorpus, removePunctuation)
+SpeechCorpus = tm_map(SpeechCorpus, removeWords, character(0))
+SpeechCorpus = tm_map(SpeechCorpus, stemDocument)
+full.dtm = TermDocumentMatrix(SpeechCorpus)
+full.td = tidy(full.dtm)
+```
+

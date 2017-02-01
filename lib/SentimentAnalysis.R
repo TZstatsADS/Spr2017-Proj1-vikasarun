@@ -6,6 +6,7 @@ library(tidytext)
 library(topicmodels)
 library(qdap)
 library(readr)
+library(calibrate)
 setwd("C:/Users/Vikas/OneDrive/Cloud Workspace/Documents/Columbia/Senior/Applied Data Science/Project 1/Spr2017-Proj1-vikasarun/lib")
 
 #Fetching data
@@ -37,6 +38,15 @@ for(i in 1:10)
   weighted.score = weighted.score + small.td.score$score[i]*small.td.score$count[i]/top_10_count
 }
 
+#Donald Trumps most positive words
+afinn_strong_sentiments = get_sentiments("afinn")
+afinn_strong_sentiments = filter(afinn_strong_sentiments, abs(score) >= 2)
+colnames(afinn_strong_sentiments) = c("term", "score")
+full.td = group_by(full.td, document)
+full.td.score = inner_join(full.td, afinn_strong_sentiments)
+full.td.score = arrange(full.td.score, desc(score))
+as.data.frame(filter(full.td.score, document == "inaugDonaldJTrump-1.txt"))
+
 #Trying to do the same for all speeches
 afinn_strong_sentiments = get_sentiments("afinn")
 afinn_strong_sentiments = filter(afinn_strong_sentiments, abs(score) >= 2)
@@ -66,6 +76,7 @@ full.scores$date = as.Date(full.scores$date, format = "%m/%d/%Y")
 full.scores = arrange(full.scores, date)
 
 plot(full.scores$date, full.scores$score)
+textxy(full.scores$date[54:58], full.scores$score[54:58],  substr(full.scores$document,6, nchar(full.scores$document)-4)[54:58], offset=0, pos =1)
 
 #Find second term presidents
 second.term.bool = grepl("*2.txt", full.scores$document)
@@ -248,6 +259,18 @@ for(i in 1:length(topics.hash))
 {
   PlotTopicTimeSeries(corpus.list, topicProbabilities, i, topics.hash[i], dates)
 }
+
+#PLotting topic assignments per president
+CreatePresidentPieCharts_15(corpus.list, topicProbabilities, dates, topics.hash)
+
+#AddingPartyAssignments
+party.list = read.csv("../data/InaugurationInfo.csv", header=TRUE)
+party.list = mutate(party.list, name = paste(File, Term, sep="-"))
+party.list = select(party.list, Party, name)
+party.list = arrange(party.list, name)
+
+CreatePartyCharts(corpus.list, party.list, topicProbabilities, topics.hash, dates)
+
 #Converting topic numbers to topic names
 ldaOut.topicnames = ldaOut.topics
 for(i in 1:nrow(ldaOut.topicnames))

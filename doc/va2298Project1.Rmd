@@ -2,9 +2,12 @@
 title: "Are Donald Trump's Speeches Really Different from those of his Predecessors?"
 output: html_notebook
 ---
-Controversy over Donald Trump's statements have overtaken the new media since the first Republican debate in August 2015. Since then, seemingly every news station has made claims about how unprecedented an unusual Donald's speech tone and content are. Unfortuantely, for many Americans, and espescially millenials, the speeches of Presidents before George W. Bush are not in recent memory, and therefore it is hard to develop a personal opinion on these claims. As such, our goal here is to examine trends in topics and tone across presidential speeches to help inform the dicussion of how the current President does or does not differ from his predecessors. Unfortuantely, because Mr. Trump has only given an inauguration speech thus far as President, that is all we can use to compare him to other Presidents. Readers should keep in mind that the Inauguration speech is not always indicative of future speeches or future policies. 
+Controversy over Donald Trump's statements have overtaken the news media since the first Republican debate in August 2015. Since then, seemingly every news station has made claims about how unprecedented and unusual Donald's speech tone and content are. Unfortuantely, for many Americans, and espescially millenials, the speeches of Presidents before George W. Bush are not in recent memory, and therefore it is hard to develop a personal opinion on these claims. As such, our goal here is to examine trends in topics and tone across presidential speeches to help inform the dicussion of how the current President does or does not differ from his predecessors. Unfortuantely, because Mr. Trump has only given an inauguration speech thus far as President, that is all we can use to compare him to other Presidents. Readers should keep in mind that the Inauguration speech is not always indicative of future speeches or future policies. 
 
 ```{r, include = FALSE}
+
+# setwd("C:/Users/Vikas/OneDrive/Cloud Workspace/Documents/Columbia/Senior/Applied Data Science/Project 1/Spr2017-Proj1-vikasarun/lib")
+
 packages.used=c("tm", "tibble", "qdap", 
                 "RColorBrewer","dplyr",
                 "tm", "wordcloud", "tidytext", "readr", "topicmodels", "calibrate")
@@ -28,7 +31,7 @@ library(topicmodels)
 library(qdap)
 library(readr)
 library(calibrate)
-setwd("C:/Users/Vikas/OneDrive/Cloud Workspace/Documents/Columbia/Senior/Applied Data Science/Project 1/Spr2017-Proj1-vikasarun/lib")
+
 
 source("../lib/PlotTopicTimeSeries.R")
 ```
@@ -112,7 +115,7 @@ dev.off()
 As soon as Trump's inauguration speech had concluded, numerous organizations came to the conclusion that it was an unusually negative speech, calling it ["American Carnage"](http://www.thedailybeast.com/articles/2017/01/20/donald-trump-s-american-cranage-inaugural.html) and a ["declaration of Political War"](https://www.theguardian.com/commentisfree/2017/jan/20/the-guardian-view-on-donald-trumps-inauguration-a-declaration-of-political-war). In order to examine this claim, we analyzed the sentiment of every inaguration speech ever given. Using the [AFINN](http://neuro.imm.dtu.dk/wiki/AFINN) method of scoring, we scored the words of the speeches on a scale from -5 (e.g, bastard) to 5 (e.g, superb). Averaging the non-neutral scores resulted in the graph below. 
 ![Figure 1: Sentiment of American Inaugural speeches over time](../figs/TimeSeriesSentimentScore.jpg)
 
-Almost immediately, once notices that Donald Trump's speech (the rightmost data point), is ranked the third most positive speech since 1900, which certainly goes against the general media perception. It is worth nothing that the two words with the highest positive score were "triumph" and "win", which could be viewed as negative depending on context and one's political beliefs. However, even when throwing out these terms, Trump's speech is still scored as very positive. 
+Almost immediately, once notices that Donald Trump's speech (the rightmost data point), is ranked the third most positive speech since 1900, which certainly goes against the general media perception. As such, even though people might percieve his content as negative, it seems like attacking Trump on his word choice and tone in his speeches is unfair. It is worth nothing that the two words with the highest positive score were "triumph" and "win", which could be viewed as negative depending on context and one's political beliefs. However, even when throwing out these terms, Trump's speech is still scored as very positive. 
 ```{r, include = FALSE}
 #Splits speeches into sentences to prepare for topic mining
 full.text = as.data.frame(matrix(nrow=length(speech.list), ncol = 2))
@@ -165,10 +168,9 @@ docs <- tm_map(docs, stripWhitespace)
 docs <- tm_map(docs,stemDocument)
 
 ```
-### Topic Analysis
+### Unity, Patriotism, and Destiny
 
-If Trump's speech is more positive than that of most other Presidents, what makes him such a polarizing candidate? To help answer this question we divided the speeches into chunks of sentences and used machine learning algorithms to find topics, which are sets of words that generally appeared together. We then named the topics at our own discretion. The topics are as follows:
-  -Economy  -America  -Defense  -Belief -Election -Patriotism -Unity  -Government -Reform -Temporal -Working Families   -Freedom  -Equality -Misc -Legislation
+If Trump's speech is more positive than that of most other Presidents, what makes him such a polarizing candidate? To help answer this question we divided the speeches into chunks of sentences and used machine learning algorithms to find topics, which are sets of words that generally appeared together.
 ```{r, include = FALSE}
 #Create DTM
 dtm <- DocumentTermMatrix(docs)
@@ -231,15 +233,42 @@ CreatePresidentPieCharts_15(corpus.list, topicProbabilities, dates, topics.hash)
 #AddingPartyAssignments
 party.list = read.csv("../data/InaugurationInfo.csv", header=TRUE)
 party.list = mutate(party.list, name = paste(File, Term, sep="-"))
-party.list = select(party.list, Party, name)
+party.list = dplyr::select(party.list, Party, name)
 party.list = arrange(party.list, name)
 
 #This function si defined in PlotTopicTimeSeries.R in ../lib
 CreatePartyCharts(corpus.list, party.list, topicProbabilities, topics.hash, dates)
 
 ```
-In many categories Trump does not appear to deviate much from the topic emphasis of previous Presidents. However, there are two major exceptions to this rule. The first one is the topic of Government.
-![Figure 2: Importance of Patriotism over Time](../figs/TopicTimeSeries15.8.jpg)
-When looking at Presidents from the Cold War period onwards, we notice that the last two speeches, namely Barack Obama and Donald Trump, place a significantly higher than normal emphasis on Government. To put this into further context, consider the average amount of time Republican presidents spend on each topic
-![Figure 3: Average Republican Topic Distribution](../figs/PartyBarPlot.Republican.jpg)
-One will notice that the average Republican spends about 6% of their time speaking explicitly about the government while Trump spends one third more time than this, at 8%. This
+In many categories Trump does not appear to deviate much from the topic emphasis of previous Presidents. However, there are two major exceptions to this rule. The first one is the topic 8.
+
+![](../figs/TopicTimeSeries15.8.jpg)
+
+When looking at Presidents from the Cold War period onwards, we notice that the last two speeches, namely Barack Obama and Donald Trump, place a significantly higher than normal emphasis on this topic. This topic appears to be about destiny, as it contains keywords such as:
+
+* great
+* change
+* hope
+* fear
+* achieve
+
+To give an idea of how rare it is for a Republican candidate to use these words, consider the following chart, illustrating the average distribution of topics for Republican candidates.
+
+![](../figs/PartyBarPlot.Republican.jpg)
+
+One will notice that the average Republican spends about 6% of their time speaking explicitly about destiny while Trump spends one third more time than this, at 8%. This 33% increase represents a large deviation from the traditional Republican dialogue. This appears to line up with Donald Trump's aim of changing the course of the USA to make it "great" and powerful again. It also lines up well with the second topic, one where Trump is a much more obvious outlier. 
+
+![](../figs/TopicTimeSeries15.7.jpg)
+
+Trump in clearly the front runner in emphasizing topic 7, which appears to focus on patriotism and unity. Important words for topic 7 include
+
+* country
+* common
+* everyone
+* sacrifice 
+* require
+* give
+
+Prior to Trump, Obama was the president who focused most on unity and patriotism in recent memory. Not only does Trump focus a lot on patriotism and unity, but he came right after Obama, who spoke more about unity and patriotism than his predecessor George W. Bush, who likely gave a more patriotic speech than usual in 2005 due to the 9/11 attacks happening under his watch. To add insult to injury, the difference between the amount of time Obama spent on the topic in 2013 and the amount of time Trump spent on the topic in 2017 is the biggest leap in increased patriotism and unity ever observed! 
+
+As such, Trump appears to be the next large step in a new, more nationalist America, and that seems to be what makes him different than other presidents, and therefore makes him either a welcome change or a scary step in the wrong direction.

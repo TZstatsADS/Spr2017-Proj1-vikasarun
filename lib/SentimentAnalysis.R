@@ -266,7 +266,7 @@ CreatePresidentPieCharts_15(corpus.list, topicProbabilities, dates, topics.hash)
 #AddingPartyAssignments
 party.list = read.csv("../data/InaugurationInfo.csv", header=TRUE)
 party.list = mutate(party.list, name = paste(File, Term, sep="-"))
-party.list = select(party.list, Party, name)
+party.list = dplyr::select(party.list, Party, name)
 party.list = arrange(party.list, name)
 
 CreatePartyCharts(corpus.list, party.list, topicProbabilities, topics.hash, dates)

@@ -69,18 +69,25 @@ CreatePartyCharts = function(corpus.list, party.list, topicProbabilties, topicNa
   topic.dist = cbind(topic.dist, party.list)
   topic.dist = group_by(topic.dist, Party)
   topic.dist = filter(topic.dist, Party == "Republican" | Party == "Democratic")
-  topic.dist = select(topic.dist, -(name))
+  topic.dist = dplyr::select(topic.dist, -(name))
   party.data.names = grouped.names[c(-2,-3,-4)]
   party.data.names = append(party.data.names, "Party")
   colnames(topic.dist) = party.data.names
   topic.dist = summarise(topic.dist, mean(Topic1), mean(Topic2), mean(Topic3), mean(Topic4), mean(Topic5), mean(Topic6), mean(Topic7), mean(Topic8), mean(Topic9), mean(Topic10), mean(Topic11), mean(Topic12), mean(Topic13), mean(Topic14), mean(Topic15))
+  leg.label = rep(NA, 15)
+  for(i in 1:length(leg.label))
+  {
+    leg.label[i] = paste("Topic ", i, sep = "")
+  }
   for(i in 1:2)
   {
     photo.name = paste("PartyBarPlot.",topic.dist$Party[i],".jpg", sep="")
     photo.path = paste("../figs/", photo.name, sep = "")
     jpeg(filename = photo.path)
     chart.name = paste(topic.dist$Party[i], " Topic Emphasis", sep = "")
-    barplot(as.numeric(topic.dist[i,2:16]), legend.text = topicNames, col = rainbow(length(topicNames)), main = chart.name, ylim = c(0,0.08), args.legend = leg.options)
+    leg.options = list(0.7,20,0.117,"n")
+    names(leg.options) = c("cex", "x", "y", "bty")
+    barplot(as.numeric(topic.dist[i,2:16]), legend.text = leg.label, col = rainbow(length(topicNames)), main = chart.name, ylim = c(0,0.1), args.legend = leg.options)
     dev.off()
   }
   
